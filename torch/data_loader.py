@@ -9,11 +9,12 @@ class ImageFolder(data.Dataset):
     
     This is just for tutorial. You can use the prebuilt torchvision.datasets.ImageFolder.
     """
+
     def __init__(self, root, transform=None):
         """Initializes image paths and preprocessing module."""
         self.image_paths = list(map(lambda x: os.path.join(root, x), os.listdir(root)))
         self.transform = transform
-        
+
     def __getitem__(self, index):
         """Reads an image from a file and preprocesses it and returns."""
         image_path = self.image_paths[index]
@@ -21,20 +22,20 @@ class ImageFolder(data.Dataset):
         if self.transform is not None:
             image = self.transform(image)
         return image
-    
+
     def __len__(self):
         """Returns the total number of image files."""
         return len(self.image_paths)
 
-    
+
 def get_loader(image_path, image_size, batch_size, num_workers=2):
     """Builds and returns Dataloader."""
-    
+
     transform = transforms.Compose([
-                    transforms.Scale(image_size),
-                    transforms.ToTensor()
+        transforms.Resize(image_size, interpolation=Image.HAMMING),
+        transforms.ToTensor()
     ])
-    
+
     dataset = ImageFolder(image_path, transform)
     data_loader = data.DataLoader(dataset=dataset,
                                   batch_size=batch_size,
@@ -42,11 +43,12 @@ def get_loader(image_path, image_size, batch_size, num_workers=2):
                                   num_workers=num_workers)
     return data_loader
 
+
 if __name__ == '__main__':
     size = 64
-    path = './CelebA/128_crop'
+    path = './resize_black'
     transform = transforms.Compose([
-        transforms.Scale(size),
+        transforms.Resize(size, interpolation=Image.HAMMING),
         transforms.ToTensor(),
         transforms.ToPILImage()
     ])

@@ -11,4 +11,4 @@ images = []
 for filename in filenames:
     print(filename)
     images.append(imageio.imread(filename))
-imageio.mimsave('faces.gif', images)
+imageio.mimsave('poke.gif', images)
