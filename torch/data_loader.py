@@ -31,9 +31,8 @@ def get_loader(image_path, image_size, batch_size, num_workers=2):
     """Builds and returns Dataloader."""
     
     transform = transforms.Compose([
-                    transforms.Resize(image_size, interpolation=Image.HAMMING),
+                    transforms.Scale(image_size),
                     transforms.ToTensor()
-                    #transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))
     ])
     
     dataset = ImageFolder(image_path, transform)
@@ -45,13 +44,13 @@ def get_loader(image_path, image_size, batch_size, num_workers=2):
 
 if __name__ == '__main__':
     size = 64
-    path = './resize_black'
+    path = './CelebA/128_crop'
     transform = transforms.Compose([
-        transforms.Resize(size, interpolation=Image.HAMMING),
+        transforms.Scale(size),
         transforms.ToTensor(),
         transforms.ToPILImage()
     ])
 
     dataset = ImageFolder(path, transform)
-    test_image = dataset.__getitem__(100)
+    test_image = dataset.__getitem__(150)
     test_image.save("test.jpg")
