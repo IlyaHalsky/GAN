@@ -37,10 +37,10 @@ if __name__ == '__main__':
     parser.add_argument('--d_conv_dim', type=int, default=64)
     
     # training hyper-parameters
-    parser.add_argument('--num_epochs', type=int, default=3)
-    parser.add_argument('--batch_size', type=int, default=32)
+    parser.add_argument('--num_epochs', type=int, default=6)
+    parser.add_argument('--batch_size', type=int, default=64)
     parser.add_argument('--sample_size', type=int, default=100)
-    parser.add_argument('--num_workers', type=int, default=2)
+    parser.add_argument('--num_workers', type=int, default=8)
     parser.add_argument('--lr', type=float, default=0.0002)
     parser.add_argument('--beta1', type=float, default=0.5)        # momentum1 in Adam
     parser.add_argument('--beta2', type=float, default=0.999)      # momentum2 in Adam
@@ -50,7 +50,7 @@ if __name__ == '__main__':
     parser.add_argument('--model_path', type=str, default='./models')
     parser.add_argument('--sample_path', type=str, default='./samples')
     parser.add_argument('--image_path', type=str, default='./CelebA/128_crop')
-    parser.add_argument('--log_step', type=int , default=10)
+    parser.add_argument('--log_step', type=int , default=100)
     parser.add_argument('--sample_step', type=int , default=100)
 
     config = parser.parse_args()

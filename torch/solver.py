@@ -137,11 +137,14 @@ class Solver(object):
         self.discriminator.load_state_dict(torch.load(d_path))
         self.generator.eval()
         self.discriminator.eval()
+        if not os.path.exists('./fianl'):
+            os.makedirs('./fianl')
         
         # Sample the images
-        noise = self.to_variable(torch.randn(self.sample_size, self.z_dim))
-        fake_images = self.generator(noise)
-        sample_path = os.path.join(self.sample_path, 'fake_samples-final.png')
-        torchvision.utils.save_image(self.denorm(fake_images.data), sample_path, nrow=10)
+        for i in range (10):
+            noise = self.to_variable(torch.randn(self.sample_size, self.z_dim))
+            fake_images = self.generator(noise)
+            sample_path = os.path.join('./fianl', 'fake_samples-final'+str(i)+'.png')
+            torchvision.utils.save_image(self.denorm(fake_images.data), sample_path, nrow=10)
         
         print("Saved sampled images to '%s'" %sample_path)
