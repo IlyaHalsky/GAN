@@ -83,7 +83,7 @@ class Solver(object):
                 # Train D to recognize real images as real.
                 outputs = self.discriminator(images)
                 real_loss = torch.mean((
-                                                   outputs - 1) ** 2)  # L2 loss instead of Binary cross entropy loss (this is optional for stable training)
+                                               outputs - 1) ** 2)  # L2 loss instead of Binary cross entropy loss (this is optional for stable training)
 
                 # Train D to recognize fake images as fake.
                 fake_images = self.generator(noise)
@@ -138,12 +138,20 @@ class Solver(object):
         self.discriminator.load_state_dict(torch.load(d_path))
         self.generator.eval()
         self.discriminator.eval()
+        if not os.path.exists('./final'):
+            os.makedirs('./final')
 
         # Sample the images
         for i in range(self.sample_size):
             noise = self.to_variable(torch.randn(1, self.z_dim))
             fake_images = self.generator(noise)
-            sample_path = os.path.join(self.sample_path + '/final', 'fake_samples-final' + str(i) + '.png')
+            sample_path = os.path.join('./final', 'fake_samples-final' + str(i) + '.png')
             torchvision.utils.save_image(self.denorm(fake_images.data), sample_path, nrow=1)
+
+        for i in range(10):
+            noise = self.to_variable(torch.randn(self.sample_size, self.z_dim))
+            fake_images = self.generator(noise)
+            sample_path = os.path.join('./final', 'fake_samples-final-full' + str(i) + '.png')
+            torchvision.utils.save_image(self.denorm(fake_images.data), sample_path, nrow=10)
 
         print("Saved sampled images to '%s'" % sample_path)

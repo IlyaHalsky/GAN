@@ -33,6 +33,8 @@ def get_loader(image_path, image_size, batch_size, num_workers=2):
 
     transform = transforms.Compose([
         transforms.Resize(image_size, interpolation=Image.HAMMING),
+        transforms.RandomHorizontalFlip(),
+        transforms.ColorJitter(contrast=0.5, saturation=0.5, hue=0.5),
         transforms.ToTensor()
     ])
 
@@ -49,6 +51,8 @@ if __name__ == '__main__':
     path = './resize_black'
     transform = transforms.Compose([
         transforms.Resize(size, interpolation=Image.HAMMING),
+        transforms.RandomHorizontalFlip(),
+        transforms.ColorJitter(contrast=0.5, saturation=0.5, hue=0.5),
         transforms.ToTensor(),
         transforms.ToPILImage()
     ])
