@@ -151,13 +151,15 @@ class Solver(object):
         # Sample the images
         for i in range(self.sample_size):
             noise = self.to_variable(torch.randn(1, self.z_dim))
-            fake_images = self.generator(noise)
+            label = self.to_variable(torch.ones(1, 18))
+            fake_images = self.generator(noise, label)
             sample_path = os.path.join('./final', 'fake_samples-final' + str(i) + '.png')
             torchvision.utils.save_image(self.denorm(fake_images.data), sample_path, nrow=1)
 
         for i in range(10):
             noise = self.to_variable(torch.randn(self.sample_size, self.z_dim))
-            fake_images = self.generator(noise)
+            label = self.to_variable(torch.ones(self.sample_size, 18))
+            fake_images = self.generator(noise, label)
             sample_path = os.path.join('./final', 'fake_samples-final-full' + str(i) + '.png')
             torchvision.utils.save_image(self.denorm(fake_images.data), sample_path, nrow=10)
 
