@@ -1,10 +1,11 @@
+import os
+
 import torch
 import torchvision
-import os
-from torch import optim
-from torch.autograd import Variable
 from model import Discriminator
 from model import Generator
+from torch import optim
+from torch.autograd import Variable
 
 
 class Solver(object):
@@ -16,6 +17,7 @@ class Solver(object):
         self.g_conv_dim = config.g_conv_dim
         self.d_conv_dim = config.d_conv_dim
         self.z_dim = config.z_dim
+        self.label_dim = config.label_dim
         self.beta1 = config.beta1
         self.beta2 = config.beta2
         self.image_size = config.image_size
@@ -34,9 +36,10 @@ class Solver(object):
         """Build generator and discriminator."""
         self.generator = Generator(z_dim=self.z_dim,
                                    image_size=self.image_size,
-                                   conv_dim=self.g_conv_dim)
-        self.discriminator = Discriminator(image_size=self.image_size,
-                                           conv_dim=self.d_conv_dim)
+                                   label_dim=self.label_dim)
+        self.discriminator = Discriminator(z_dim=self.z_dim,
+                                           image_size=self.image_size,
+                                           label_dim=self.label_dim)
         self.g_optimizer = optim.Adam(self.generator.parameters(),
                                       self.lr, [self.beta1, self.beta2])
         self.d_optimizer = optim.Adam(self.discriminator.parameters(),
@@ -71,23 +74,27 @@ class Solver(object):
     def train(self):
         """Train generator and discriminator."""
         fixed_noise = self.to_variable(torch.randn(self.batch_size, self.z_dim))
+
         total_step = len(self.data_loader)
         for epoch in range(self.num_epochs):
-            for i, images in enumerate(self.data_loader):
-
+            for i, data in enumerate(self.data_loader):
                 # ===================== Train D =====================#
-                images = self.to_variable(images)
-                batch_size = images.size(0)
+                images = self.to_variable(data[0])
+                batch_size = data[0].size(0)
+                labels = self.to_variable(data[1]
+                                          .unsqueeze(-1)
+                                          .unsqueeze(-1)
+                                          .expand(batch_size, data[1].size(1), images.size(2), images.size(3)))
+
                 noise = self.to_variable(torch.randn(batch_size, self.z_dim))
 
                 # Train D to recognize real images as real.
-                outputs = self.discriminator(images)
-                real_loss = torch.mean((
-                                               outputs - 1) ** 2)  # L2 loss instead of Binary cross entropy loss (this is optional for stable training)
+                outputs = self.discriminator(images, labels)
+                real_loss = torch.mean((outputs - 1) ** 2)  # L2 loss instead of Binary cross entropy loss (this is optional for stable training)
 
                 # Train D to recognize fake images as fake.
-                fake_images = self.generator(noise)
-                outputs = self.discriminator(fake_images)
+                fake_features = self.generator(noise, data[1])
+                outputs = self.discriminator(fake_features, labels)
                 fake_loss = torch.mean(outputs ** 2)
 
                 # Backprop + optimize
@@ -100,8 +107,8 @@ class Solver(object):
                 noise = self.to_variable(torch.randn(batch_size, self.z_dim))
 
                 # Train G so that D recognizes G(z) as real.
-                fake_images = self.generator(noise)
-                outputs = self.discriminator(fake_images)
+                fake_features = self.generator(noise, data[1])
+                outputs = self.discriminator(fake_features, labels)
                 g_loss = torch.mean((outputs - 1) ** 2)
 
                 # Backprop + optimize
@@ -118,8 +125,8 @@ class Solver(object):
 
                 # save the sampled images
                 if (i + 1) % self.sample_step == 0:
-                    fake_images = self.generator(fixed_noise)
-                    torchvision.utils.save_image(self.denorm(fake_images.data),
+                    fake_features = self.generator(fixed_noise, data[1])
+                    torchvision.utils.save_image(self.denorm(fake_features.data),
                                                  os.path.join(self.sample_path,
                                                               'fake_samples-%d-%d.png' % (epoch + 1, i + 1)))
 

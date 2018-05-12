@@ -1,7 +1,8 @@
 import argparse
 import os
-from solver import Solver
+
 from data_loader import get_loader
+from solver import Solver
 from torch.backends import cudnn
 
 
@@ -11,6 +12,7 @@ def main(config):
     data_loader = get_loader(image_path=config.image_path,
                              image_size=config.image_size,
                              batch_size=config.batch_size,
+                             features_length=config.label_dim,
                              num_workers=config.num_workers)
 
     solver = Solver(config, data_loader)
@@ -32,8 +34,9 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
 
     # model hyper-parameters
-    parser.add_argument('--image_size', type=int, default=128)
+    parser.add_argument('--image_size', type=int, default=(128, 128))
     parser.add_argument('--z_dim', type=int, default=100)
+    parser.add_argument('--label_dim', type=int, default=18)
     parser.add_argument('--g_conv_dim', type=int, default=64)
     parser.add_argument('--d_conv_dim', type=int, default=64)
 
