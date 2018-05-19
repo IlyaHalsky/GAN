@@ -35,17 +35,17 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
 
     # model hyper-parameters
-    parser.add_argument('--image_size', type=int, default=(64, 64))
+    parser.add_argument('--image_size', type=int, default=(128, 128))
     parser.add_argument('--z_dim', type=int, default=100)
     parser.add_argument('--label_dim', type=int, default=15)
-    parser.add_argument('--g_conv_dim', type=int, default=64)
-    parser.add_argument('--d_conv_dim', type=int, default=64)
+    parser.add_argument('--g_conv_dim', type=int, default=128)
+    parser.add_argument('--d_conv_dim', type=int, default=128)
 
     # training hyper-parameters
     parser.add_argument('--num_epochs', type=int, default=500)
     parser.add_argument('--batch_size', type=int, default=32)
     parser.add_argument('--sample_size', type=int, default=100)
-    parser.add_argument('--num_workers', type=int, default=4)
+    parser.add_argument('--num_workers', type=int, default=8)
     parser.add_argument('--lr', type=float, default=0.0002)
     parser.add_argument('--beta1', type=float, default=0.5)  # momentum1 in Adam
     parser.add_argument('--beta2', type=float, default=0.999)  # momentum2 in Adam

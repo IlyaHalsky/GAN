@@ -98,7 +98,8 @@ class Solver(object):
 
                 # Train D to recognize real images as real.
                 outputs = self.discriminator(images, labels)
-                real_loss = torch.mean((outputs - 1) ** 2)  # L2 loss instead of Binary cross entropy loss (this is optional for stable training)
+                real_loss = torch.mean((
+                                                   outputs - 1) ** 2)  # L2 loss instead of Binary cross entropy loss (this is optional for stable training)
 
                 # Train D to recognize fake images as fake.
                 fake_features = self.generator(noise, data[1])
@@ -139,10 +140,11 @@ class Solver(object):
                                                               'fake_samples-%d-%d.png' % (epoch + 1, i + 1)))
 
             # save the model parameters for each epoch
-            g_path = os.path.join(self.model_path, 'generator-%d.pkl' % (epoch + 1))
-            d_path = os.path.join(self.model_path, 'discriminator-%d.pkl' % (epoch + 1))
-            torch.save(self.generator.state_dict(), g_path)
-            torch.save(self.discriminator.state_dict(), d_path)
+            if epoch % 10 == 0:
+                g_path = os.path.join(self.model_path, 'generator-%d.pkl' % (epoch + 1))
+                d_path = os.path.join(self.model_path, 'discriminator-%d.pkl' % (epoch + 1))
+                torch.save(self.generator.state_dict(), g_path)
+                torch.save(self.discriminator.state_dict(), d_path)
 
     def sample(self):
 
@@ -159,14 +161,14 @@ class Solver(object):
         # Sample the images
         for i in range(self.sample_size):
             noise = self.to_variable(torch.randn(1, self.z_dim))
-            label = self.to_variable(torch.ones(1, 18))
+            label = self.to_variable(torch.ones(1, 15))
             fake_images = self.generator(noise, label)
             sample_path = os.path.join('./final', 'fake_samples-final' + str(i) + '.png')
             torchvision.utils.save_image(self.denorm(fake_images.data), sample_path, nrow=1)
 
         for i in range(10):
             noise = self.to_variable(torch.randn(self.sample_size, self.z_dim))
-            label = self.to_variable(torch.ones(self.sample_size, 18))
+            label = self.to_variable(torch.ones(self.sample_size, 15))
             fake_images = self.generator(noise, label)
             sample_path = os.path.join('./final', 'fake_samples-final-full' + str(i) + '.png')
             torchvision.utils.save_image(self.denorm(fake_images.data), sample_path, nrow=10)

@@ -10,9 +10,10 @@ if not os.path.exists(dst):
     os.mkdir(dst)
 
 orig_size = size = (307, 456)
-size = (256, 256)
+size = (128, 128)
 
 for each in os.listdir(src):
+    print(each)
     if each != 'Thumbs.db':
         im = Image.open(os.path.join(src, each)).convert('RGBA')
         fff = Image.new('RGBA', im.size, (256,) * 4)
