@@ -10,6 +10,7 @@ def main(config):
     cudnn.benchmark = True
 
     data_loader = get_loader(image_path=config.image_path,
+                             label_path=config.label_path,
                              image_size=config.image_size,
                              batch_size=config.batch_size,
                              features_length=config.label_dim,
@@ -34,9 +35,9 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
 
     # model hyper-parameters
-    parser.add_argument('--image_size', type=int, default=(128, 128))
+    parser.add_argument('--image_size', type=int, default=(64, 64))
     parser.add_argument('--z_dim', type=int, default=100)
-    parser.add_argument('--label_dim', type=int, default=18)
+    parser.add_argument('--label_dim', type=int, default=15)
     parser.add_argument('--g_conv_dim', type=int, default=64)
     parser.add_argument('--d_conv_dim', type=int, default=64)
 
@@ -50,10 +51,11 @@ if __name__ == '__main__':
     parser.add_argument('--beta2', type=float, default=0.999)  # momentum2 in Adam
 
     # misc
-    parser.add_argument('--mode', type=str, default='sample')
+    parser.add_argument('--mode', type=str, default='train')
     parser.add_argument('--model_path', type=str, default='./models')
     parser.add_argument('--sample_path', type=str, default='./samples')
-    parser.add_argument('--image_path', type=str, default='./resize_black')
+    parser.add_argument('--image_path', type=str, default='./resize_cards')
+    parser.add_argument('--label_path', type=str, default='./features/')
     parser.add_argument('--log_step', type=int, default=10)
     parser.add_argument('--sample_step', type=int, default=25)
 

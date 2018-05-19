@@ -36,10 +36,12 @@ class Solver(object):
         """Build generator and discriminator."""
         self.generator = Generator(z_dim=self.z_dim,
                                    image_size=self.image_size,
-                                   label_dim=self.label_dim)
+                                   label_dim=self.label_dim,
+                                   conv_dim=self.d_conv_dim)
         self.discriminator = Discriminator(z_dim=self.z_dim,
                                            image_size=self.image_size,
-                                           label_dim=self.label_dim)
+                                           label_dim=self.label_dim,
+                                           conv_dim=self.d_conv_dim)
         self.g_optimizer = optim.Adam(self.generator.parameters(),
                                       self.lr, [self.beta1, self.beta2])
         self.d_optimizer = optim.Adam(self.discriminator.parameters(),
@@ -71,9 +73,15 @@ class Solver(object):
         out = (x + 1) / 2
         return out.clamp(0, 1)
 
+    def get_fixed_label(self):
+        for i, data in enumerate(self.data_loader):
+            value = data[1]
+            return value
+
     def train(self):
         """Train generator and discriminator."""
         fixed_noise = self.to_variable(torch.randn(self.batch_size, self.z_dim))
+        fixed_label = self.get_fixed_label()
 
         total_step = len(self.data_loader)
         for epoch in range(self.num_epochs):
@@ -125,7 +133,7 @@ class Solver(object):
 
                 # save the sampled images
                 if (i + 1) % self.sample_step == 0:
-                    fake_features = self.generator(fixed_noise, data[1])
+                    fake_features = self.generator(fixed_noise, fixed_label)
                     torchvision.utils.save_image(self.denorm(fake_features.data),
                                                  os.path.join(self.sample_path,
                                                               'fake_samples-%d-%d.png' % (epoch + 1, i + 1)))

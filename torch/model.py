@@ -1,6 +1,7 @@
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
+from torch.autograd import Variable
 
 
 def deconv(c_in, c_out, k_size, stride=2, pad=1, bn=True):
@@ -18,14 +19,14 @@ class Generator(nn.Module):
     def __init__(self,
                  z_dim=100,
                  label_dim=18,
-                 image_size=(128, 128)):
+                 image_size=(128, 128),
+                 conv_dim=64):
         super(Generator, self).__init__()
         self.image_size = image_size
         self.z_dim = z_dim
         self.label_dim = label_dim
         self.input_dim = z_dim + label_dim
 
-        conv_dim = 128 // 8
         kernel_size = map(lambda s: s // 16, image_size)
         self.fc = deconv(self.input_dim, conv_dim * 8, kernel_size, 1, 0, False)
 
@@ -35,6 +36,7 @@ class Generator(nn.Module):
         self.deconv4 = deconv(conv_dim, 3, 4, bn=False)
 
     def forward(self, z, label):
+        label = Variable(label.cuda())
         z = torch.cat([z, label], 1)
         z = z.view(z.size(0), z.size(1), 1, 1)
         out = self.fc(z)  # (?, 512, 4, 4)
@@ -60,14 +62,13 @@ class Discriminator(nn.Module):
     def __init__(self,
                  z_dim=100,
                  label_dim=18,
-                 image_size=(128, 128)):
+                 image_size=(128, 128),
+                 conv_dim=64):
         super(Discriminator, self).__init__()
         self.image_size = image_size
         self.z_dim = z_dim
         self.label_dim = label_dim
         self.input_dim = 3 + label_dim
-
-        conv_dim = 64
 
         self.conv1 = conv(self.input_dim, conv_dim, 4, bn=False)
         self.conv2 = conv(conv_dim, conv_dim * 2, 4)
