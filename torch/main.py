@@ -51,7 +51,7 @@ if __name__ == '__main__':
     parser.add_argument('--beta2', type=float, default=0.999)  # momentum2 in Adam
 
     # misc
-    parser.add_argument('--mode', type=str, default='train')
+    parser.add_argument('--mode', type=str, default='sample')
     parser.add_argument('--model_path', type=str, default='./models')
     parser.add_argument('--sample_path', type=str, default='./samples')
     parser.add_argument('--image_path', type=str, default='./resize_cards')

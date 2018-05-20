@@ -73,6 +73,10 @@ class Solver(object):
         out = (x + 1) / 2
         return out.clamp(0, 1)
 
+    def denorm_2(self, x):
+        out = (x + 0.1)
+        return out.clamp(0,1)
+
     def get_fixed_label(self):
         for i, data in enumerate(self.data_loader):
             value = data[1]
@@ -99,7 +103,7 @@ class Solver(object):
                 # Train D to recognize real images as real.
                 outputs = self.discriminator(images, labels)
                 real_loss = torch.mean((
-                                                   outputs - 1) ** 2)  # L2 loss instead of Binary cross entropy loss (this is optional for stable training)
+                                               outputs - 1) ** 2)  # L2 loss instead of Binary cross entropy loss (this is optional for stable training)
 
                 # Train D to recognize fake images as fake.
                 fake_features = self.generator(noise, data[1])
@@ -147,10 +151,10 @@ class Solver(object):
                 torch.save(self.discriminator.state_dict(), d_path)
 
     def sample(self):
-
+        import numpy as np
         # Load trained parameters 
-        g_path = os.path.join(self.model_path, 'generator-%d.pkl' % (self.num_epochs))
-        d_path = os.path.join(self.model_path, 'discriminator-%d.pkl' % (self.num_epochs))
+        g_path = os.path.join(self.model_path, 'generator-%d.pkl' % (241))
+        d_path = os.path.join(self.model_path, 'discriminator-%d.pkl' % (241))
         self.generator.load_state_dict(torch.load(g_path))
         self.discriminator.load_state_dict(torch.load(d_path))
         self.generator.eval()
@@ -158,6 +162,104 @@ class Solver(object):
         if not os.path.exists('./final'):
             os.makedirs('./final')
 
+        labels = [[0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0]]
+        label = torch.from_numpy(np.array(labels)).float()
+
+        labels_full = list()
+        for i in range(0, 6):
+            for j in range(0, 6):
+                class_label_1 = 1.0 - (j / 6.0)
+                class_label_2 = (j / 6.0)
+                rarity_label_1 = 1.0 - (i / 6.0)
+                rarity_label_2 = (i / 6.0)
+                labels = [rarity_label_1, 0, 0, 0, rarity_label_2, 0, 0, 0, 0, 0, class_label_1, 0, class_label_2, 0, 0]
+                labels_full.append(labels)
+                # label = torch.from_numpy(np.array(labels)).float()
+
+        labels_full_torch = torch.from_numpy(np.array(labels_full)).float()
+        noise = self.to_variable(torch.randn(36, self.z_dim))
+        fake_images = self.generator(noise, labels_full_torch)
+        sample_path = os.path.join('./final', 'common_to_legendary_priest_to_shaman' + '.png')
+        torchvision.utils.save_image(self.denorm_2(fake_images.data), sample_path, nrow=6)
+
+        for i in range(10):
+            noise = self.to_variable(torch.randn(1, self.z_dim))
+            fake_images = self.generator(noise, label)
+            sample_path = os.path.join('./final', 'fake_priest_legendary' + str(i) + '.png')
+            torchvision.utils.save_image(self.denorm_2(fake_images.data), sample_path, nrow=1)
+
+        label = torch.from_numpy(np.random.uniform(size=(100, 15))).float()
+        noise = self.to_variable(torch.randn(100, self.z_dim))
+        fake_images = self.generator(noise, label)
+        sample_path = os.path.join('./final', 'random' + '.png')
+        torchvision.utils.save_image(self.denorm_2(fake_images.data), sample_path, nrow=10)
+
+        labels = [[0, 1, 0, 0, 1, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0]]
+        label = torch.from_numpy(np.array(labels)).float()
+        for i in range(10):
+            noise = self.to_variable(torch.randn(1, self.z_dim))
+            fake_images = self.generator(noise, label)
+            sample_path = os.path.join('./final', 'pal_pr_comm_legen' + str(i) + '.png')
+            torchvision.utils.save_image(self.denorm_2(fake_images.data), sample_path, nrow=1)
+
+        label_grad = []
+        for j in range(0, 10):
+            rarity_label_1 = 1.0 - (j / 10.0)
+            rarity_label_2 = (j / 10.0)
+            labels = [0, 0, 0, 0, 1, rarity_label_1, rarity_label_2, 0, 0, 0, 0, 0, 0, 0, 0]
+            label_grad.append(labels)
+
+        for j in range(0, 10):
+            rarity_label_1 = 1.0 - (j / 10.0)
+            rarity_label_2 = (j / 10.0)
+            labels = [0, 0, 0, 0, 1, rarity_label_1, 0, rarity_label_2, 0, 0, 0, 0, 0, 0, 0]
+            label_grad.append(labels)
+        for j in range(0, 10):
+            rarity_label_1 = 1.0 - (j / 10.0)
+            rarity_label_2 = (j / 10.0)
+            labels = [0, 0, 0, 0, 1, rarity_label_1, 0,0,rarity_label_2, 0, 0, 0, 0, 0, 0]
+            label_grad.append(labels)
+
+        for j in range(0, 10):
+            rarity_label_1 = 1.0 - (j / 10.0)
+            rarity_label_2 = (j / 10.0)
+            labels = [0, 0, 0, 0, 1, rarity_label_1, 0,0,0,rarity_label_2, 0, 0, 0, 0, 0]
+            label_grad.append(labels)
+
+        for j in range(0, 10):
+            rarity_label_1 = 1.0 - (j / 10.0)
+            rarity_label_2 = (j / 10.0)
+            labels = [0, 0, 0, 0, 1, rarity_label_1, 0,0,0,0,rarity_label_2, 0, 0, 0, 0]
+            label_grad.append(labels)
+        for j in range(0, 10):
+            rarity_label_1 = 1.0 - (j / 10.0)
+            rarity_label_2 = (j / 10.0)
+            labels = [0, 0, 0, 0, 1, rarity_label_1, 0,0,0,0,0,rarity_label_2, 0, 0, 0]
+            label_grad.append(labels)
+        for j in range(0, 10):
+            rarity_label_1 = 1.0 - (j / 10.0)
+            rarity_label_2 = (j / 10.0)
+            labels = [0, 0, 0, 0, 1, rarity_label_1, 0,0,0,0,0,0,rarity_label_2, 0, 0]
+            label_grad.append(labels)
+        for j in range(0, 10):
+            rarity_label_1 = 1.0 - (j / 10.0)
+            rarity_label_2 = (j / 10.0)
+            labels = [0, 0, 0, 0, 1, rarity_label_1, 0,0,0,0,0,0,0,rarity_label_2, 0]
+            label_grad.append(labels)
+        for j in range(0, 10):
+            rarity_label_1 = 1.0 - (j / 10.0)
+            rarity_label_2 = (j / 10.0)
+            labels = [0, 0, 0, 0, 1, rarity_label_1, 0,0,0,0,0,0,0,0,rarity_label_2]
+            label_grad.append(labels)
+
+        label = torch.from_numpy(np.array(label_grad)).float()
+        noise = self.to_variable(torch.randn(90, self.z_dim))
+        fake_images = self.generator(noise, label)
+        sample_path = os.path.join('./final', 'big_grad' + '.png')
+        torchvision.utils.save_image(self.denorm_2(fake_images.data), sample_path, nrow=10)
+
+
+        '''
         # Sample the images
         for i in range(self.sample_size):
             noise = self.to_variable(torch.randn(1, self.z_dim))
@@ -172,5 +274,5 @@ class Solver(object):
             fake_images = self.generator(noise, label)
             sample_path = os.path.join('./final', 'fake_samples-final-full' + str(i) + '.png')
             torchvision.utils.save_image(self.denorm(fake_images.data), sample_path, nrow=10)
-
+        '''
         print("Saved sampled images to '%s'" % sample_path)

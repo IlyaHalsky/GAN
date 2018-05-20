@@ -37,6 +37,7 @@ class Generator(nn.Module):
 
     def forward(self, z, label):
         label = Variable(label.cuda())
+        print(z, '\n', label)
         z = torch.cat([z, label], 1)
         z = z.view(z.size(0), z.size(1), 1, 1)
         out = self.fc(z)  # (?, 512, 4, 4)
