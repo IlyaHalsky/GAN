@@ -75,7 +75,7 @@ class Solver(object):
 
     def denorm_2(self, x):
         out = (x + 0.1)
-        return out.clamp(0,1)
+        return out.clamp(0, 1)
 
     def get_fixed_label(self):
         for i, data in enumerate(self.data_loader):
@@ -162,6 +162,26 @@ class Solver(object):
         if not os.path.exists('./final'):
             os.makedirs('./final')
 
+        labels = [[0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0]]
+        label = torch.from_numpy(np.array(labels)).float()
+        noise = self.to_variable(torch.randn(1, self.z_dim))
+        fake = self.generator(noise, label)
+        for i, data in enumerate(fake):
+            sample_path = os.path.join('./final', 'filter' + str(i) + '.png')
+            data2 = data.data.cpu().numpy()
+            print(np.shape(data2))
+            a = np.shape(data2)[1]
+            b = np.shape(data2)[2]
+            print(a, b)
+            data3 = np.zeros((a, 3, b, b))
+            print(np.shape(data3))
+            for j in range(a):
+                data3[j] = [data2[0][j], data2[0][j], data2[0][j]]
+            print(np.shape(data3))
+            import math
+            torchvision.utils.save_image(torch.from_numpy(data3), sample_path, nrow=int(math.sqrt(a)), pad_value=1)
+
+        '''
         labels = [[0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0]]
         label = torch.from_numpy(np.array(labels)).float()
 
@@ -257,7 +277,7 @@ class Solver(object):
         fake_images = self.generator(noise, label)
         sample_path = os.path.join('./final', 'big_grad' + '.png')
         torchvision.utils.save_image(self.denorm_2(fake_images.data), sample_path, nrow=10)
-
+        '''
 
         '''
         # Sample the images
@@ -275,4 +295,4 @@ class Solver(object):
             sample_path = os.path.join('./final', 'fake_samples-final-full' + str(i) + '.png')
             torchvision.utils.save_image(self.denorm(fake_images.data), sample_path, nrow=10)
         '''
-        print("Saved sampled images to '%s'" % sample_path)
+        print("Saved sampled images to '%s'" % 'asas')

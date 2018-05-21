@@ -3,8 +3,8 @@ import cv2
 from PIL import Image
 from PIL import ImageMath
 
-src = "./samples"  # pokeRGB_black
-dst = "./resizes_samples/"  # resized
+src = "./final"  # pokeRGB_black
+dst = "./final_resize/"  # resized
 
 if not os.path.exists(dst):
     os.mkdir(dst)

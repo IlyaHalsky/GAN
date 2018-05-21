@@ -37,15 +37,15 @@ class Generator(nn.Module):
 
     def forward(self, z, label):
         label = Variable(label.cuda())
-        print(z, '\n', label)
+        #print(z, '\n', label)
         z = torch.cat([z, label], 1)
         z = z.view(z.size(0), z.size(1), 1, 1)
         out = self.fc(z)  # (?, 512, 4, 4)
-        out = F.leaky_relu(self.deconv1(out), 0.05)
-        out = F.leaky_relu(self.deconv2(out), 0.05)
-        out = F.leaky_relu(self.deconv3(out), 0.05)
-        out = F.tanh(self.deconv4(out))
-        return out
+        out1 = F.leaky_relu(self.deconv1(out), 0.05)
+        out2 = F.leaky_relu(self.deconv2(out1), 0.05)
+        out3 = F.leaky_relu(self.deconv3(out2), 0.05)
+        out4 = F.tanh(self.deconv4(out3))
+        return [out4, out3,out2,out1]
 
 
 def conv(c_in, c_out, k_size, stride=2, pad=1, bn=True):
